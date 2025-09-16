@@ -1,4 +1,6 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router";
+import { Provider } from "react-redux";
+import { store } from "./store/store";
 import SignIn from "./pages/AuthPages/SignIn";
 import SignUp from "./pages/AuthPages/SignUp";
 import NotFound from "./pages/OtherPage/NotFound";
@@ -18,16 +20,43 @@ import Blank from "./pages/Blank";
 import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
+import { AuthProvider } from "./components/auth/AuthProvider";
+import { AuthWrapper } from "./components/auth/AuthWrapper";
+
+// Manage Pages
+import ManageCategories from "./pages/Manage/ManageCategories";
+import ManageSubcategories from "./pages/Manage/ManageSubcategories";
+import ManageVideos from "./pages/Manage/ManageVideos";
+import ManageShorts from "./pages/Manage/ManageShorts";
+import ViewUserReviews from "./pages/Manage/ViewUserReviews";
+import AboutUs from "./pages/AboutUs/AboutUs";
+import PrivacyPolicy from "./pages/AboutUs/PrivacyPolicy";
+import TermsAndConditions from "./pages/AboutUs/TermsAndConditions";
 
 export default function App() {
   return (
-    <>
-      <Router>
-        <ScrollToTop />
-        <Routes>
-          {/* Dashboard Layout */}
-          <Route element={<AppLayout />}>
-            <Route index path="/" element={<Home />} />
+    <Provider store={store}>
+      <AuthProvider>
+        <Router>
+          <ScrollToTop />
+          <AuthWrapper>
+            <Routes>
+            {/* Redirect root to dashboard if authenticated, otherwise to login */}
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/overview" element={<Navigate to="/dashboard" replace />} />
+
+            {/* Auth Layout */}
+            <Route path="/signin" element={<SignIn />} />
+            <Route path="/signup" element={<SignUp />} />
+
+          {/* Protected Dashboard Layout */}
+          <Route element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }>
+            <Route path="/dashboard" element={<Home />} />
 
             {/* Others Page */}
             <Route path="/profile" element={<UserProfiles />} />
@@ -51,16 +80,26 @@ export default function App() {
             {/* Charts */}
             <Route path="/line-chart" element={<LineChart />} />
             <Route path="/bar-chart" element={<BarChart />} />
-          </Route>
 
-          {/* Auth Layout */}
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/signup" element={<SignUp />} />
+            {/* Manage Pages */}
+            <Route path="/manage/categories" element={<ManageCategories />} />
+            <Route path="/manage/subcategories" element={<ManageSubcategories />} />
+            <Route path="/manage/videos" element={<ManageVideos />} />
+            <Route path="/manage/shorts" element={<ManageShorts />} />
+            <Route path="/manage/reviews" element={<ViewUserReviews />} />
+            
+            {/* About Us Page */}
+            <Route path="/about-us" element={<AboutUs />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+          </Route>
 
           {/* Fallback Route */}
           <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Router>
-    </>
+            </Routes>
+          </AuthWrapper>
+        </Router>
+      </AuthProvider>
+    </Provider>
   );
 }
