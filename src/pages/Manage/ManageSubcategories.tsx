@@ -116,7 +116,7 @@ function SubcategoriesTable({ searchTerm, onEditSubcategory }: { searchTerm: str
                   isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
-                  Subcategory Name
+                  Name
                 </TableCell>
                 <TableCell
                   isHeader
@@ -128,13 +128,13 @@ function SubcategoriesTable({ searchTerm, onEditSubcategory }: { searchTerm: str
                   isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
-                  Parent Category
+                  Category
                 </TableCell>
                 <TableCell
                   isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
-                  Videos Count
+                  Videos
                 </TableCell>
                 <TableCell
                   isHeader

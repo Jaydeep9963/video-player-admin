@@ -301,7 +301,7 @@ const AddVideoModal: React.FC<AddVideoModalProps> = ({ isOpen, onClose, editVide
   ];
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} className="max-w-2xl mx-4">
+    <Modal isOpen={isOpen} onClose={handleClose} className="max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
       <div className="p-6">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
           {isEditMode ? 'Edit Video' : 'Add New Video'}

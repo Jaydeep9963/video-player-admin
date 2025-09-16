@@ -30,9 +30,10 @@ import ManageSubcategories from "./pages/Manage/ManageSubcategories";
 import ManageVideos from "./pages/Manage/ManageVideos";
 import ManageShorts from "./pages/Manage/ManageShorts";
 import ViewUserReviews from "./pages/Manage/ViewUserReviews";
-import AboutUs from "./pages/AboutUs/AboutUs";
-import PrivacyPolicy from "./pages/AboutUs/PrivacyPolicy";
-import TermsAndConditions from "./pages/AboutUs/TermsAndConditions";
+import AboutUs from "./pages/Content/AboutUs";
+import PrivacyPolicy from "./pages/Content/PrivacyPolicy";
+import TermsAndConditions from "./pages/Content/TermsAndConditions";
+import SendNotification from "./pages/Content/SendNotification";
 
 export default function App() {
   return (
@@ -89,6 +90,7 @@ export default function App() {
             <Route path="/manage/reviews" element={<ViewUserReviews />} />
             
             {/* About Us Page */}
+            <Route path="/send-notification" element={<SendNotification />} />
             <Route path="/about-us" element={<AboutUs />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms-and-conditions" element={<TermsAndConditions />} />

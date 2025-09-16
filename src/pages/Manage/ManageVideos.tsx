@@ -15,15 +15,9 @@ import { getFreshImageUrl } from "../../config/api";
 import { Video } from "../../store/types";
 import AddVideoModal from "../../components/modals/AddVideoModal";
 import ConfirmDeleteModal from "../../components/modals/ConfirmDeleteModal";
+import VideoDetailsModal from "../../components/modals/VideoDeatailsModal";
 
-// Helper function to format duration from seconds to MM:SS
-const formatDuration = (seconds: number): string => {
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = Math.floor(seconds % 60);
-  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-};
-
-function VideosTable({ searchTerm, onEditVideo }: { searchTerm: string; onEditVideo: (video: Video) => void }) {
+function VideosTable({ searchTerm, onEditVideo, onViewVideo }: { searchTerm: string; onEditVideo: (video: Video) => void; onViewVideo: (video: Video) => void }) {
   const { data: videos = [], isLoading, error } = useGetVideosQuery({ search: searchTerm });
   const [deleteVideo] = useDeleteVideoMutation();
   const [deleteModal, setDeleteModal] = useState<{
@@ -51,6 +45,11 @@ function VideosTable({ searchTerm, onEditVideo }: { searchTerm: string; onEditVi
       video,
       isDeleting: false,
     });
+  };
+
+  // Add this function to handle view click
+  const handleViewClick = (video: Video) => {
+    onViewVideo(video);
   };
 
   const handleDeleteConfirm = async () => {
@@ -193,22 +192,22 @@ function VideosTable({ searchTerm, onEditVideo }: { searchTerm: string; onEditVi
                   </span>
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                  {formatDuration(video.duration)}
+                  {video.durationFormatted}
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                   {video.views.toLocaleString()}
                 </TableCell>
                 <TableCell className="px-4 py-3 text-start">
-                  <Badge 
-                    variant="light" 
+                  <Badge
+                    variant="light"
                     color={video.platform === 'youtube' ? 'error' : 'info'}
                   >
-                    {video.platform === "upload" ? "Uploaded" : "Youtube"}
+                    {video.platform === "upload" ? "Uploaded" : "YouTube"}
                   </Badge>
                 </TableCell>
                 <TableCell className="px-4 py-3 text-start">
-                  <Badge 
-                    variant="light" 
+                  <Badge
+                    variant="light"
                     color={video.isPublished ? 'success' : 'warning'}
                   >
                     {video.isPublished ? 'Published' : 'Draft'}
@@ -216,19 +215,25 @@ function VideosTable({ searchTerm, onEditVideo }: { searchTerm: string; onEditVi
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
                   <div className="flex space-x-2">
-                    <button 
+                    <button
                       onClick={() => handleEditClick(video)}
                       className="text-blue-600 hover:text-blue-800 dark:text-blue-400 p-1 rounded hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                      title="Edit Video"
                     >
                       <PencilIcon className="w-4 h-4" />
                     </button>
-                    <button 
+                    <button
                       onClick={() => handleDeleteClick(video)}
                       className="text-red-600 hover:text-red-800 dark:text-red-400 p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20"
+                      title="Delete Video"
                     >
                       <TrashBinIcon className="w-4 h-4" />
                     </button>
-                    <button className="text-green-600 hover:green-500 dark:text-green-400 p-1 rounded hover:bg-green-100 dark:hover:bg-green-900/30">
+                    <button
+                      onClick={() => handleViewClick(video)}
+                      className="text-green-600 hover:text-green-800 dark:text-green-400 p-1 rounded hover:bg-green-50 dark:hover:bg-green-900/20"
+                      title="View Video Details"
+                    >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -246,8 +251,8 @@ function VideosTable({ searchTerm, onEditVideo }: { searchTerm: string; onEditVi
           No videos found matching your search.
         </div>
       )}
-      <ConfirmDeleteModal 
-        isOpen={deleteModal.isOpen} 
+      <ConfirmDeleteModal
+        isOpen={deleteModal.isOpen}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
         title="Delete Video"
@@ -264,6 +269,9 @@ export default function ManageVideos() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editVideo, setEditVideo] = useState<Video | null>(null);
+  // Add these new state variables for the details modal
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
 
   const handleOpenAddModal = () => {
     setIsAddModalOpen(true);
@@ -281,6 +289,17 @@ export default function ManageVideos() {
   const handleCloseEditModal = () => {
     setIsEditModalOpen(false);
     setEditVideo(null);
+  };
+
+  // Add these new handler functions for the details modal
+  const handleViewVideo = (video: Video) => {
+    setSelectedVideo(video);
+    setIsDetailsModalOpen(true);
+  };
+
+  const handleCloseDetailsModal = () => {
+    setIsDetailsModalOpen(false);
+    setSelectedVideo(null);
   };
 
   return (
@@ -316,7 +335,7 @@ export default function ManageVideos() {
                   />
                 </div>
                 {/* Add Video Button */}
-                <button 
+                <button
                   onClick={handleOpenAddModal}
                   className="inline-flex items-center gap-2 rounded-lg border border-blue-600 bg-white px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 dark:border-blue-400 dark:bg-gray-800 dark:text-blue-400 dark:hover:bg-blue-900/20 transition-colors"
                 >
@@ -335,7 +354,7 @@ export default function ManageVideos() {
                 <h3 className="text-base font-medium text-gray-800 dark:text-white/90">
                   Manage Videos
                 </h3>
-                <button 
+                <button
                   onClick={handleOpenAddModal}
                   className="inline-flex items-center gap-2 rounded-lg border border-blue-600 bg-white px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 dark:border-blue-400 dark:bg-gray-800 dark:text-blue-400 dark:hover:bg-blue-900/20 transition-colors"
                 >
@@ -345,7 +364,7 @@ export default function ManageVideos() {
                   Video
                 </button>
               </div>
-              
+
               {/* Search Box - Full Width on Mobile */}
               <div className="relative w-full">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -367,23 +386,30 @@ export default function ManageVideos() {
           {/* Card Body */}
           <div className="p-4 border-t border-gray-100 dark:border-gray-800 sm:p-6">
             <div className="space-y-6">
-              <VideosTable searchTerm={searchTerm} onEditVideo={handleEditVideo} />
+              <VideosTable searchTerm={searchTerm} onEditVideo={handleEditVideo} onViewVideo={handleViewVideo} />
             </div>
           </div>
         </div>
       </div>
 
       {/* Add Video Modal */}
-      <AddVideoModal 
-        isOpen={isAddModalOpen} 
-        onClose={handleCloseAddModal} 
+      <AddVideoModal
+        isOpen={isAddModalOpen}
+        onClose={handleCloseAddModal}
       />
 
       {/* Edit Video Modal */}
-      <AddVideoModal 
-        isOpen={isEditModalOpen} 
-        onClose={handleCloseEditModal} 
+      <AddVideoModal
+        isOpen={isEditModalOpen}
+        onClose={handleCloseEditModal}
         editVideo={editVideo}
+      />
+
+      {/* Video Details Modal */}
+      <VideoDetailsModal 
+        isOpen={isDetailsModalOpen}
+        onClose={handleCloseDetailsModal}
+        video={selectedVideo}
       />
     </>
   );

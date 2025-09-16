@@ -86,7 +86,7 @@ export interface Video {
   platform: string;
   youtubeUrl?: string;
   thumbnailPath: string;
-  duration: number;
+  durationFormatted: string;
   category: Category;
   subcategory: Subcategory;
   views: number;
@@ -112,7 +112,7 @@ export interface Short {
   platform: string;
   youtubeUrl?: string;
   thumbnailPath: string;
-  duration: number;
+  durationFormatted: string;
   views: number;
   isPublished: boolean;
   createdAt: string;
@@ -157,6 +157,26 @@ export interface OverviewResponse {
   recentItems: any[];
 }
 
+export interface RecentItem {
+  _id: string;
+  title: string;
+  description: string;
+  durationFormatted: number;
+  category?: {
+    _id: string;
+    name: string;
+  };
+  subcategory?: {
+    _id: string;
+    name: string;
+  };
+  platform: string;
+  thumbnailPath: string;
+  type: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // Content types
 export interface Content {
   _id: string;
@@ -180,3 +200,4 @@ export interface UpdateContentRequest {
 export interface GetContentRequest {
   type?: string;
 }
+

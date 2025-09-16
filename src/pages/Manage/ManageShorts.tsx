@@ -15,15 +15,9 @@ import { getFreshImageUrl } from "../../config/api";
 import { Short } from "../../store/types";
 import AddShortsModal from "../../components/modals/AddShortsModal";
 import ConfirmDeleteModal from "../../components/modals/ConfirmDeleteModal";
+import ShortDetailsModal from "../../components/modals/ShortDetailsModal"; // Add this import
 
-// Helper function to format duration from seconds to MM:SS
-const formatDuration = (seconds: number): string => {
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = Math.floor(seconds % 60);
-  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-};
-
-function ShortsTable({ searchTerm, onEditShort }: { searchTerm: string; onEditShort: (short: Short) => void }) {
+function ShortsTable({ searchTerm, onEditShort, onViewShort }: { searchTerm: string; onEditShort: (short: Short) => void; onViewShort: (short: Short) => void }) {
   const { data: shorts = [], isLoading, error } = useGetShortsQuery({ search: searchTerm });
   const [deleteShort] = useDeleteShortMutation();
   const [deleteModal, setDeleteModal] = useState<{
@@ -51,6 +45,11 @@ function ShortsTable({ searchTerm, onEditShort }: { searchTerm: string; onEditSh
       short,
       isDeleting: false,
     });
+  };
+
+  // Add this function to handle view click
+  const handleViewClick = (short: Short) => {
+    onViewShort(short);
   };
 
   const handleDeleteConfirm = async () => {
@@ -193,7 +192,7 @@ function ShortsTable({ searchTerm, onEditShort }: { searchTerm: string; onEditSh
                   </span>
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                  {formatDuration(short.duration)}
+                  {short.durationFormatted}
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                   {short.views.toLocaleString()}
@@ -203,7 +202,7 @@ function ShortsTable({ searchTerm, onEditShort }: { searchTerm: string; onEditSh
                     variant="light" 
                     color={short.platform === 'youtube' ? 'error' : 'info'}
                   >
-                    {short.platform === "upload" ? "Uploaded" : "Youtube"}
+                    {short.platform === "upload" ? "Uploaded" : "YouTube"}
                   </Badge>
                 </TableCell>
                 <TableCell className="px-4 py-3 text-start">
@@ -219,16 +218,22 @@ function ShortsTable({ searchTerm, onEditShort }: { searchTerm: string; onEditSh
                     <button 
                       onClick={() => handleEditClick(short)}
                       className="text-blue-600 hover:text-blue-800 dark:text-blue-400 p-1 rounded hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                      title="Edit Short"
                     >
                       <PencilIcon className="w-4 h-4" />
                     </button>
                     <button 
                       onClick={() => handleDeleteClick(short)}
                       className="text-red-600 hover:text-red-800 dark:text-red-400 p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20"
+                      title="Delete Short"
                     >
                       <TrashBinIcon className="w-4 h-4" />
                     </button>
-                    <button className="text-green-600 hover:green-500 dark:text-green-400 p-1 rounded hover:bg-green-100 dark:hover:bg-green-900/30">
+                    <button 
+                      onClick={() => handleViewClick(short)}
+                      className="text-green-600 hover:text-green-800 dark:text-green-400 p-1 rounded hover:bg-green-50 dark:hover:bg-green-900/20"
+                      title="View Short Details"
+                    >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -264,6 +269,9 @@ export default function ManageShorts() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editShort, setEditShort] = useState<Short | null>(null);
+  // Add these new state variables for the details modal
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [selectedShort, setSelectedShort] = useState<Short | null>(null);
 
   const handleOpenAddModal = () => {
     setIsAddModalOpen(true);
@@ -281,6 +289,17 @@ export default function ManageShorts() {
   const handleCloseEditModal = () => {
     setIsEditModalOpen(false);
     setEditShort(null);
+  };
+
+  // Add these new handler functions for the details modal
+  const handleViewShort = (short: Short) => {
+    setSelectedShort(short);
+    setIsDetailsModalOpen(true);
+  };
+
+  const handleCloseDetailsModal = () => {
+    setIsDetailsModalOpen(false);
+    setSelectedShort(null);
   };
 
   return (
@@ -367,7 +386,7 @@ export default function ManageShorts() {
           {/* Card Body */}
           <div className="p-4 border-t border-gray-100 dark:border-gray-800 sm:p-6">
             <div className="space-y-6">
-              <ShortsTable searchTerm={searchTerm} onEditShort={handleEditShort} />
+              <ShortsTable searchTerm={searchTerm} onEditShort={handleEditShort} onViewShort={handleViewShort} />
             </div>
           </div>
         </div>
@@ -384,6 +403,13 @@ export default function ManageShorts() {
         isOpen={isEditModalOpen} 
         onClose={handleCloseEditModal} 
         editShort={editShort}
+      />
+
+      {/* Short Details Modal */}
+      <ShortDetailsModal 
+        isOpen={isDetailsModalOpen}
+        onClose={handleCloseDetailsModal}
+        short={selectedShort}
       />
     </>
   );

@@ -8,28 +8,7 @@ import {
 import Badge from "../ui/badge/Badge";
 import { useGetOverviewQuery } from "../../store/slices/api";
 import { getImageUrl } from "../../config/api";
-import { formatDuration } from "../../utils/formatUtils";
-
-// Define the TypeScript interface for recent items
-interface RecentItem {
-  _id: string;
-  title: string;
-  description: string;
-  duration: number;
-  category?: {
-    _id: string;
-    name: string;
-  };
-  subcategory?: {
-    _id: string;
-    name: string;
-  };
-  platform: string;
-  thumbnailPath: string;
-  type: string;
-  createdAt: string;
-  updatedAt: string;
-}
+import { RecentItem } from "../../store/types";
 
 export default function RecentOrders() {
   const { data: overviewData, isLoading, error } = useGetOverviewQuery();
@@ -72,37 +51,41 @@ export default function RecentOrders() {
             <TableRow>
               <TableCell
                 isHeader
-                className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                className="px-4 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
               >
                 Video
               </TableCell>
               <TableCell
                 isHeader
-                className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                className="px-4 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
               >
-                Duration
+                <span className="hidden sm:inline">Duration</span>
+                <span className="sm:hidden">Time</span>
               </TableCell>
               <TableCell
                 isHeader
-                className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                className="px-4 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
               >
-                Category
+                <span className="hidden sm:inline">Category</span>
+                <span className="sm:hidden">Cat.</span>
               </TableCell>
               <TableCell
                 isHeader
-                className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                className="px-4 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
               >
-                Subcategory
+                <span className="hidden sm:inline">Subcategory</span>
+                <span className="sm:hidden">Sub.</span>
               </TableCell>
               <TableCell
                 isHeader
-                className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                className="px-4 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
               >
-                Platform
+                <span className="hidden sm:inline">Platform</span>
+                <span className="sm:hidden">Plat.</span>
               </TableCell>
               <TableCell
                 isHeader
-                className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                className="px-4 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
               >
                 Type
               </TableCell>
@@ -113,16 +96,16 @@ export default function RecentOrders() {
           <TableBody className="divide-y divide-gray-100 dark:divide-gray-800">
             {recentItems.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="py-8 text-center text-gray-500 dark:text-gray-400">
+                <TableCell colSpan={6} className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
                   No recent videos found
                 </TableCell>
               </TableRow>
             ) : (
               recentItems.map((item) => (
                 <TableRow key={item._id} className="">
-                  <TableCell className="py-3">
+                  <TableCell className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <div className="h-[50px] w-[50px] overflow-hidden rounded-md">
+                      <div className="h-[50px] w-[50px] overflow-hidden rounded-md flex-shrink-0">
                         <img
                           src={getImageUrl(item.thumbnailPath)}
                           className="h-[50px] w-[50px] object-cover"
@@ -143,16 +126,20 @@ export default function RecentOrders() {
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">
-                    {formatDuration(item.duration)}
+                  <TableCell className="px-4 py-3 text-gray-500 text-theme-sm dark:text-gray-400 whitespace-nowrap">
+                    {item.durationFormatted}
                   </TableCell>
-                  <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">
-                    {item.category?.name || '-'}
+                  <TableCell className="px-4 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
+                    <span className="truncate block max-w-[100px] sm:max-w-none">
+                      {item.category?.name || 'N/A'}
+                    </span>
                   </TableCell>
-                  <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">
-                    {item.subcategory?.name || '-'}
+                  <TableCell className="px-4 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
+                    <span className="truncate block max-w-[100px] sm:max-w-none">
+                      {item.subcategory?.name || 'N/A'}
+                    </span>
                   </TableCell>
-                  <TableCell className="py-3">
+                  <TableCell className="px-4 py-3">
                     <Badge
                       size="sm"
                       variant="light"
@@ -161,7 +148,7 @@ export default function RecentOrders() {
                       {item.platform === 'youtube' ? 'YouTube' : 'Uploaded'}
                     </Badge>
                   </TableCell>
-                  <TableCell className="py-3">
+                  <TableCell className="px-4 py-3">
                     <Badge
                       size="sm"
                       variant="light"

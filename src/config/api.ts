@@ -2,6 +2,7 @@
 export const API_CONFIG = {
   BASE_URL: import.meta.env.VITE_API_BASE_URL,
   BASE_IMAGE_URL: import.meta.env.VITE_IMAGE_BASE_URL,
+  BASE_VIDEO_URL: import.meta.env.VITE_VIDEO_BASE_URL,
   ENDPOINTS: {
     AUTH: {
       LOGIN: '/auth/login',

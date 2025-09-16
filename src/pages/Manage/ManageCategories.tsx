@@ -112,7 +112,7 @@ function CategoriesTable({ searchTerm, onEditCategory }: { searchTerm: string; o
                   isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
-                  Category Name
+                  Name
                 </TableCell>
                 <TableCell
                   isHeader
@@ -130,7 +130,7 @@ function CategoriesTable({ searchTerm, onEditCategory }: { searchTerm: string; o
                   isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
-                  Videos Count
+                  Videos
                 </TableCell>
                 <TableCell
                   isHeader
