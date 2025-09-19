@@ -27,8 +27,15 @@ const VideoDetailsModal: React.FC<VideoDetailsModalProps> = ({
         });
     };
 
+    // Fix: Construct the correct video URL
+    const getVideoUrl = (filePath: string) => {
+        // Remove any leading slash and ensure proper path construction
+        const cleanPath = filePath.startsWith('/') ? filePath.slice(1) : filePath;
+        return `${API_CONFIG.BASE_VIDEO_URL}/${cleanPath}`;
+    };
+
     return (
-        <Modal isOpen={isOpen} onClose={onClose} className="max-w-md mx-4 max-h-[90vh] overflow-y-auto">
+        <Modal isOpen={isOpen} onClose={onClose} className="max-w-md mx-4 max-h-[90vh] overflow-y-auto scrollbar-hide">
             <div className="p-6">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
@@ -263,12 +270,12 @@ const VideoDetailsModal: React.FC<VideoDetailsModalProps> = ({
                             </label>
                             <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
                                 <a
-                                    href={video.filePath}
+                                    href={getVideoUrl(video.filePath)}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="text-blue-600 dark:text-blue-400 hover:underline break-all"
                                 >
-                                    {`${API_CONFIG.BASE_VIDEO_URL}/${video.filePath}`}
+                                    {getVideoUrl(video.filePath)}
                                 </a>
                             </div>
                         </div>
@@ -311,14 +318,12 @@ const VideoDetailsModal: React.FC<VideoDetailsModalProps> = ({
                     {video.filePath && (
                         <button
                             type="button"
-                            onClick={() =>
-                                window.open(
-                                    `${API_CONFIG.BASE_VIDEO_URL}/${video.filePath}`,
-                                    "_blank",
-                                    "noopener,noreferrer"
-                                )
-                            }
-                            className="flex-1 inline-flex items-center justify-center gap-1 px-4 py-2 text-sm font-medium bg-blue-500 text-white bg- border border-transparent rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                            onClick={() => {
+                                // Fix: Use the same URL construction method
+                                const videoUrl = getVideoUrl(video.filePath);
+                                window.open(videoUrl, "_blank", "noopener,noreferrer");
+                            }}
+                            className="flex-1 inline-flex items-center justify-center gap-1 px-4 py-2 text-sm font-medium bg-blue-500 text-white border border-transparent rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <svg
                                 className="w-5 h-5"

@@ -41,10 +41,10 @@ export default function ViewUserReviews() {
   return (
     <div>
       <PageMeta
-        title="View Reviews | TailAdmin - Video Player Admin Dashboard"
-        description="View user reviews page for TailAdmin - Video Player Admin Dashboard"
+        title="View Feedbacks | TailAdmin - Video Player Admin Dashboard"
+        description="View user feedbacks page for TailAdmin - Video Player Admin Dashboard"
       />
-      <PageBreadcrumb pageTitle="View Reviews" />
+      <PageBreadcrumb pageTitle="Feedbacks" />
       <div className="space-y-6">
         <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
           {/* Card Header with Search */}
@@ -52,7 +52,7 @@ export default function ViewUserReviews() {
             {/* Desktop Layout */}
             <div className="hidden sm:flex items-center justify-between">
               <h3 className="text-base font-medium text-gray-800 dark:text-white/90">
-                Feedbacks
+                View Feedbacks
               </h3>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

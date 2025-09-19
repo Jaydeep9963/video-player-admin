@@ -262,7 +262,7 @@ const AddShortsModal: React.FC<AddShortsModalProps> = ({ isOpen, onClose, editSh
   ];
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} className="max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+    <Modal isOpen={isOpen} onClose={handleClose} className="max-w-2xl mx-4 max-h-[90vh] overflow-y-auto scrollbar-hide">
       <div className="p-6">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
           {isEditMode ? 'Edit Short' : 'Add New Short'}

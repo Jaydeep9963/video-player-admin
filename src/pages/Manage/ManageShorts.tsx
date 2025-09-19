@@ -134,12 +134,6 @@ function ShortsTable({ searchTerm, onEditShort, onViewShort }: { searchTerm: str
                 isHeader
                 className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
               >
-                Views
-              </TableCell>
-              <TableCell
-                isHeader
-                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-              >
                 Platform
               </TableCell>
               <TableCell
@@ -166,7 +160,7 @@ function ShortsTable({ searchTerm, onEditShort, onViewShort }: { searchTerm: str
                   </span>
                 </TableCell>
                 <TableCell className="px-4 py-3 text-start">
-                  <div className="w-20 h-12 overflow-hidden rounded-lg bg-gray-200 dark:bg-gray-700">
+                  <div className="w-13 h-20 overflow-hidden rounded-lg bg-gray-200 dark:bg-gray-700">
                     {short.thumbnailPath ? (
                       <img 
                         src={getFreshImageUrl(short.thumbnailPath)} 
@@ -193,9 +187,6 @@ function ShortsTable({ searchTerm, onEditShort, onViewShort }: { searchTerm: str
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                   {short.durationFormatted}
-                </TableCell>
-                <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                  {short.views.toLocaleString()}
                 </TableCell>
                 <TableCell className="px-4 py-3 text-start">
                   <Badge 

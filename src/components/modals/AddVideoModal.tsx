@@ -4,7 +4,7 @@ import Input from '../form/input/InputField';
 import TextArea from '../form/input/TextArea';
 import FileInput from '../form/input/FileInput';
 import Select from '../form/Select';
-import { useCreateVideoMutation, useUpdateVideoMutation, useGetCategoriesQuery, useGetSubcategoriesQuery } from '../../store/slices/api';
+import { useCreateVideoMutation, useUpdateVideoMutation, useGetCategoriesQuery, useGetSubcategoriesByCategoryQuery } from '../../store/slices/api';
 import { Video } from '../../store/types';
 import { getImageUrl } from '../../config/api';
 
@@ -33,9 +33,14 @@ const AddVideoModal: React.FC<AddVideoModalProps> = ({ isOpen, onClose, editVide
   const [createVideo] = useCreateVideoMutation();
   const [updateVideo] = useUpdateVideoMutation();
   const { data: categories = [] } = useGetCategoriesQuery({});
-  const { data: subcategories = [] } = useGetSubcategoriesQuery({
-    category: formData.category || undefined
-  });
+
+  // Use the correct hook that fetches subcategories by category ID
+  const { data: subcategories = [], isLoading: subcategoriesLoading } = useGetSubcategoriesByCategoryQuery(
+    formData.category,
+    {
+      skip: !formData.category // Skip the query if no category is selected
+    }
+  );
 
   const isEditMode = !!editVideo;
 
@@ -52,7 +57,7 @@ const AddVideoModal: React.FC<AddVideoModalProps> = ({ isOpen, onClose, editVide
         thumbnail: null,
         video: null,
       });
-      
+
       // Set existing thumbnail preview
       if (editVideo.thumbnailPath) {
         setThumbnailPreview(getImageUrl(editVideo.thumbnailPath));
@@ -76,26 +81,34 @@ const AddVideoModal: React.FC<AddVideoModalProps> = ({ isOpen, onClose, editVide
     setErrors({});
   }, [editVideo, isOpen]);
 
-  // Reset subcategory when category changes
+  // Reset subcategory when category changes (for both create and edit mode)
   useEffect(() => {
-    if (formData.category && !isEditMode) {
-      setFormData(prev => ({ ...prev, subcategory: '' }));
+    if (formData.category) {
+      // Only reset subcategory if we're not in edit mode during initial load
+      // or if the category actually changed in edit mode
+      const shouldResetSubcategory = !isEditMode ||
+        (isEditMode && editVideo && formData.category !== editVideo.category._id);
+
+      if (shouldResetSubcategory) {
+        setFormData(prev => ({ ...prev, subcategory: '' }));
+        // Clear subcategory error
+        setErrors(prev => ({ ...prev, subcategory: '' }));
+      }
     }
-  }, [formData.category, isEditMode]);
+  }, [formData.category, isEditMode, editVideo]);
 
   // Reset video file/URL when platform changes
   useEffect(() => {
     if (!isEditMode) {
-      setFormData(prev => ({ 
-        ...prev, 
+      setFormData(prev => ({
+        ...prev,
         video: null,
         youtubeUrl: ''
       }));
-      // Clear related errors
-      setErrors(prev => ({ 
-        ...prev, 
-        video: '', 
-        youtubeUrl: '' 
+      setErrors(prev => ({
+        ...prev,
+        video: '',
+        youtubeUrl: ''
       }));
     }
   }, [formData.platform, isEditMode]);
@@ -113,20 +126,21 @@ const AddVideoModal: React.FC<AddVideoModalProps> = ({ isOpen, onClose, editVide
     if (file) {
       // Check file size (10MB limit for thumbnails)
       const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+
       if (file.size > maxSize) {
-        setErrors(prev => ({ 
-          ...prev, 
-          thumbnail: 'Thumbnail file size must be less than 10MB' 
+        setErrors(prev => ({
+          ...prev,
+          thumbnail: 'Thumbnail file size must be less than 10MB'
         }));
         return;
       }
-      
+
       setFormData(prev => ({ ...prev, thumbnail: file }));
-      
+
       // Create immediate preview URL using URL.createObjectURL
       const previewUrl = URL.createObjectURL(file);
       setThumbnailPreview(previewUrl);
-      
+
       // Clear error
       if (errors.thumbnail) {
         setErrors(prev => ({ ...prev, thumbnail: '' }));
@@ -142,15 +156,15 @@ const AddVideoModal: React.FC<AddVideoModalProps> = ({ isOpen, onClose, editVide
       // Check file size (500MB limit)
       const maxSize = 500 * 1024 * 1024; // 500MB in bytes
       if (file.size > maxSize) {
-        setErrors(prev => ({ 
-          ...prev, 
-          video: 'Video file size must be less than 500MB' 
+        setErrors(prev => ({
+          ...prev,
+          video: 'Video file size must be less than 500MB'
         }));
         return;
       }
-      
+
       setFormData(prev => ({ ...prev, video: file }));
-      
+
       // Clear error
       if (errors.video) {
         setErrors(prev => ({ ...prev, video: '' }));
@@ -198,7 +212,7 @@ const AddVideoModal: React.FC<AddVideoModalProps> = ({ isOpen, onClose, editVide
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -212,13 +226,14 @@ const AddVideoModal: React.FC<AddVideoModalProps> = ({ isOpen, onClose, editVide
       submitFormData.append('category', formData.category);
       submitFormData.append('subcategory', formData.subcategory);
       submitFormData.append('platform', formData.platform);
-      
+
       if (formData.platform === 'youtube' && formData.youtubeUrl) {
         submitFormData.append('youtubeUrl', formData.youtubeUrl.trim());
       } else if (formData.video) {
         submitFormData.append('video', formData.video);
       }
-      
+
+      // Only append thumbnail if a new file is selected
       if (formData.thumbnail) {
         submitFormData.append('thumbnail', formData.thumbnail);
       }
@@ -228,7 +243,7 @@ const AddVideoModal: React.FC<AddVideoModalProps> = ({ isOpen, onClose, editVide
       } else {
         await createVideo(submitFormData).unwrap();
       }
-      
+
       // Reset form and close modal
       setFormData({
         title: '',
@@ -301,7 +316,7 @@ const AddVideoModal: React.FC<AddVideoModalProps> = ({ isOpen, onClose, editVide
   ];
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} className="max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+    <Modal isOpen={isOpen} onClose={handleClose} className="max-w-2xl mx-4 max-h-[90vh] overflow-y-auto scrollbar-hide">
       <div className="p-6">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
           {isEditMode ? 'Edit Video' : 'Add New Video'}
@@ -366,16 +381,20 @@ const AddVideoModal: React.FC<AddVideoModalProps> = ({ isOpen, onClose, editVide
               </label>
               <Select
                 options={subcategoryOptions}
-                placeholder="Select Subcategory"
+                placeholder={subcategoriesLoading ? "Loading subcategories..." : "Select Subcategory"}
                 onChange={(value) => handleInputChange('subcategory', value)}
                 defaultValue={formData.subcategory}
                 className={errors.subcategory ? 'border-red-500' : ''}
+                disabled={!formData.category || subcategoriesLoading}
               />
               {errors.subcategory && (
                 <p className="mt-1.5 text-xs text-red-500">{errors.subcategory}</p>
               )}
               {!formData.category && (
                 <p className="mt-1.5 text-xs text-gray-500">Please select a category first</p>
+              )}
+              {formData.category && subcategories.length === 0 && !subcategoriesLoading && (
+                <p className="mt-1.5 text-xs text-gray-500">No subcategories available for this category</p>
               )}
             </div>
           </div>
@@ -468,7 +487,7 @@ const AddVideoModal: React.FC<AddVideoModalProps> = ({ isOpen, onClose, editVide
                       return (
                         <div className="w-full h-full bg-gray-50 dark:bg-gray-800 flex flex-col items-center justify-center text-gray-500 dark:text-gray-400 text-xs">
                           <svg className="w-8 h-8 mb-2 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
                         </div>
                       );

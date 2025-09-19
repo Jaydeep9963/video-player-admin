@@ -128,13 +128,19 @@ function VideosTable({ searchTerm, onEditVideo, onViewVideo }: { searchTerm: str
                 isHeader
                 className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
               >
-                Duration
+                Category
               </TableCell>
               <TableCell
                 isHeader
                 className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
               >
-                Views
+                Subcategory
+              </TableCell>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+              >
+                Duration
               </TableCell>
               <TableCell
                 isHeader
@@ -192,10 +198,13 @@ function VideosTable({ searchTerm, onEditVideo, onViewVideo }: { searchTerm: str
                   </span>
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                  {video.durationFormatted}
+                  {video.category.name}
                 </TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                  {video.views.toLocaleString()}
+                  {video.subcategory.name}
+                </TableCell>
+                <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                  {video.durationFormatted}
                 </TableCell>
                 <TableCell className="px-4 py-3 text-start">
                   <Badge

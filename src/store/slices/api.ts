@@ -154,6 +154,11 @@ export const subcategoriesApi = createApi({
       },
       providesTags: ['Subcategory'],
     }),
+    getSubcategoriesByCategory: builder.query<Subcategory[], string>({
+      query: (categoryId) =>
+        API_CONFIG.ENDPOINTS.SUBCATEGORIES.GET_BY_CATEGORY.replace(':id', categoryId),
+      providesTags: ['Subcategory'],
+    }),
     createSubcategory: builder.mutation<Subcategory, FormData>({
       query: (formData) => ({
         url: API_CONFIG.ENDPOINTS.SUBCATEGORIES.CREATE,
@@ -440,6 +445,7 @@ export const {
 
 export const {
   useGetSubcategoriesQuery,
+  useGetSubcategoriesByCategoryQuery, 
   useCreateSubcategoryMutation,
   useDeleteSubcategoryMutation,
   useUpdateSubcategoryMutation,

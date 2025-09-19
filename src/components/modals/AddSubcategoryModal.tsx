@@ -45,10 +45,12 @@ const AddSubcategoryModal: React.FC<AddSubcategoryModalProps> = ({ isOpen, onClo
       setFormData({
         name: editSubcategory.name,
         description: editSubcategory.description,
-        category: editSubcategory.category._id,
+        category: typeof editSubcategory.category === "string"
+          ? editSubcategory.category
+          : editSubcategory.category._id,
         image: null,
       });
-      
+
       // Set existing image preview
       if (editSubcategory.image) {
         setImagePreview(getImageUrl(editSubcategory.image));
@@ -83,11 +85,11 @@ const AddSubcategoryModal: React.FC<AddSubcategoryModalProps> = ({ isOpen, onClo
     const file = event.target.files?.[0];
     if (file) {
       setFormData(prev => ({ ...prev, image: file }));
-      
+
       // Create immediate preview URL using URL.createObjectURL
       const previewUrl = URL.createObjectURL(file);
       setImagePreview(previewUrl);
-      
+
       // Clear error
       if (errors.image) {
         setErrors(prev => ({ ...prev, image: '' }));
@@ -123,7 +125,7 @@ const AddSubcategoryModal: React.FC<AddSubcategoryModalProps> = ({ isOpen, onClo
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -144,7 +146,7 @@ const AddSubcategoryModal: React.FC<AddSubcategoryModalProps> = ({ isOpen, onClo
       } else {
         await createSubcategory(submitFormData).unwrap();
       }
-      
+
       // Reset form and close modal
       setFormData({ name: '', description: '', category: '', image: null });
       setImagePreview(null);
@@ -181,7 +183,7 @@ const AddSubcategoryModal: React.FC<AddSubcategoryModalProps> = ({ isOpen, onClo
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} className="max-w-md mx-4 max-h-[90vh] overflow-y-auto">
+    <Modal isOpen={isOpen} onClose={handleClose} className="max-w-md mx-4 max-h-[90vh] overflow-y-auto scrollbar-hide">
       <div className="p-6">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
           {isEditMode ? 'Edit Subcategory' : 'Add New Subcategory'}

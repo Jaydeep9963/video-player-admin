@@ -20,6 +20,7 @@ export const API_CONFIG = {
     SUBCATEGORIES: {
       GET_ALL: '/admin/subcategories',
       GET_BY_ID: '/admin/subcategories/:id',
+      GET_BY_CATEGORY: '/admin/subcategories/category/:id',
       CREATE: '/admin/subcategories',
       UPDATE: '/admin/subcategories/:id',
       DELETE: '/admin/subcategories/:id',
@@ -61,16 +62,16 @@ export const API_CONFIG = {
 // Helper function to construct full image URLs
 export const getImageUrl = (imagePath: string, bustCache: boolean = false): string => {
   if (!imagePath) return '';
-  
+
   // If it's already a full URL, return as is
   if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
     const url = bustCache ? `${imagePath}?t=${Date.now()}` : imagePath;
     return url;
   }
-  
+
   // If it's a relative path, construct the full URL
   const baseUrl = API_CONFIG.BASE_IMAGE_URL || 'http://192.168.1.129:3000';
-  
+
   let fullUrl = '';
   // Handle different path formats
   if (imagePath.startsWith('/uploads/')) {
@@ -81,12 +82,12 @@ export const getImageUrl = (imagePath: string, bustCache: boolean = false): stri
     // Assume it's just the filename and construct the full path
     fullUrl = `${baseUrl}/uploads/images/${imagePath}`;
   }
-  
+
   // Add cache-busting parameter if requested
   if (bustCache) {
     fullUrl += `?t=${Date.now()}`;
   }
-  
+
   return fullUrl;
 };
 

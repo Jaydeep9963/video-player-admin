@@ -61,13 +61,15 @@ export interface Subcategory {
   _id: string;
   name: string;
   description: string;
-  category: Category;
+  category: Category | string;
   image: string;
   videoCount: number;
   createdAt: string;
   updatedAt: string;
   __v: number;
 }
+
+export type SubcategoriesResponse = Subcategory[];
 
 export interface GetSubcategoriesRequest {
   page?: number;

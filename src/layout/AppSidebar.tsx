@@ -48,7 +48,7 @@ const manageItems: NavItem[] = [
     name: "User Management",
     icon: <UserCircleIcon />,
     subItems: [
-      { name: "View Reviews", path: "/manage/reviews", pro: false },
+      { name: "View Feedbacks", path: "/manage/reviews", pro: false },
     ],
   },
 ];

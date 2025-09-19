@@ -27,8 +27,15 @@ const ShortDetailsModal: React.FC<ShortDetailsModalProps> = ({
         });
     };
 
+    // Fix: Construct the correct video URL
+    const getVideoUrl = (filePath: string) => {
+        // Remove any leading slash and ensure proper path construction
+        const cleanPath = filePath.startsWith('/') ? filePath.slice(1) : filePath;
+        return `${API_CONFIG.BASE_VIDEO_URL}/${cleanPath}`;
+    };
+
     return (
-        <Modal isOpen={isOpen} onClose={onClose} className="max-w-md mx-4 max-h-[90vh] overflow-y-auto">
+        <Modal isOpen={isOpen} onClose={onClose} className="max-w-md mx-4 max-h-[90vh] overflow-y-auto scrollbar-hide">
             <div className="p-6">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
@@ -136,12 +143,12 @@ const ShortDetailsModal: React.FC<ShortDetailsModalProps> = ({
                             </label>
                             <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
                                 <a
-                                    href={short.filePath}
+                                    href={getVideoUrl(short.filePath)}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="text-blue-600 dark:text-blue-400 hover:underline break-all inline-flex items-center gap-1"
                                 >
-                                    {`${API_CONFIG.BASE_VIDEO_URL}/${short.filePath}`}
+                                    {getVideoUrl(short.filePath)}
                                 </a>
                             </div>
                         </div>
@@ -184,13 +191,11 @@ const ShortDetailsModal: React.FC<ShortDetailsModalProps> = ({
                     {short.filePath && (
                         <button
                             type="button"
-                            onClick={() =>
-                                window.open(
-                                    `${API_CONFIG.BASE_VIDEO_URL}/${short.filePath}`,
-                                    "_blank",
-                                    "noopener,noreferrer"
-                                )
-                            }
+                            onClick={() => {
+                                // Fix: Use the same URL construction method
+                                const videoUrl = getVideoUrl(short.filePath);
+                                window.open(videoUrl, "_blank", "noopener,noreferrer");
+                            }}
                             className="flex-1 inline-flex items-center justify-center gap-1 px-4 py-2 text-sm font-medium text-white bg-blue-500 border border-transparent rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <svg

@@ -180,7 +180,7 @@ export default function SendNotification() {
                                     <div className="ck-editor-container">
                                         <style>{`
                       .ck-editor-container .ck-editor__editable {
-                        min-height: 100px;
+                        min-height: 80px;
                         padding: 20px;
                         font-size: 14px;
                         line-height: 1.6;
@@ -424,7 +424,7 @@ export default function SendNotification() {
                         {aboutText && (
                             <div className="mb-6 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
                                 <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Preview (plain text that will be sent):
+                                    Preview (Plain text that will be sent):
                                 </h4>
                                 <p className="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap break-words">
                                     {stripHtmlTags(aboutText) || 'Empty message'}
